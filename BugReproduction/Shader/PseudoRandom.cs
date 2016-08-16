@@ -21,14 +21,14 @@ namespace BugReproduction.Shader
 {
     public static class PseudoRandom
     {
-        private static Effect effect;
+        private static Effect _effect;
 
         public static RenderTarget2D Generated;
 
         public static void Initialize(GraphicsDevice graphics, Effect rEffect, int width, int height)
         {
             Generated = new RenderTarget2D(graphics, width, height);
-            effect = rEffect;
+            _effect = rEffect;
         }
 
         public static void Draw(GraphicsDevice graphics, SpriteBatch sp)
@@ -36,9 +36,9 @@ namespace BugReproduction.Shader
             graphics.SetRenderTarget(Generated);
             graphics.Clear(Color.Black);
 
-            sp.Begin(SpriteSortMode.Deferred, null, null, null, null, effect);
+            sp.Begin(SpriteSortMode.Deferred, null, null, null, null, _effect);
             {
-                effect.CurrentTechnique.Passes[0].Apply();
+                _effect.CurrentTechnique.Passes[0].Apply();
                 sp.Draw(Game1.CoolPixle2016, new Rectangle(0, 0, (int) Game1.Display_Dims.X, (int) Game1.Display_Dims.Y),
                     Color.White);
             }
