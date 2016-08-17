@@ -6,13 +6,12 @@
 // Project: BugReproduction
 // Filename: Game1.cs
 // Date - created:2016.08.16 - 18:03
-// Date - current: 2016.08.16 - 18:52
+// Date - current: 2016.08.17 - 15:53
 
 #endregion
 
 #region Usings
 
-using BugReproduction.Shader;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -26,9 +25,11 @@ namespace BugReproduction
     /// </summary>
     public class Game1 : Game
     {
+        // Set this variable to true, to get the "not drawnig" airplane (which is unintended)
+        private const bool BUGGED_OUT = false;
         private static Texture2D SomeKindOfWaleAirplane;
         public static Texture2D CoolPixle2016;
-        public static Vector2 Display_Dims;
+        private static Effect WhiteScreenShader;
         private readonly GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
@@ -46,13 +47,11 @@ namespace BugReproduction
         /// </summary>
         protected override void Initialize()
         {
+            // Setup my "one-pixel" white texture
             CoolPixle2016 = new Texture2D(GraphicsDevice, 1, 1);
             CoolPixle2016.SetData(new[] {Color.White});
-            Display_Dims = new Vector2(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
 
-            // Initialize all shaders
-            PseudoRandom.Initialize(graphics.GraphicsDevice, Content.Load<Effect>("Shader/P2"),
-                graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
+            WhiteScreenShader = Content.Load<Effect>("Shader/P2");
 
             base.Initialize();
         }
@@ -66,10 +65,7 @@ namespace BugReproduction
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // NOTE: THIS line here is no good:
-            PseudoRandom.Draw(graphics.GraphicsDevice, spriteBatch);
-                // This just draws white pixels into a rendertarget...
-
+            // Load my airplane like image... :P
             SomeKindOfWaleAirplane = Content.Load<Texture2D>("Texture/Airplane");
         }
 
@@ -79,7 +75,6 @@ namespace BugReproduction
         /// </summary>
         protected override void UnloadContent()
         {
-            //SomeKindOfWaleAirplane.Dispose(); // Clear exit
         }
 
         /// <summary>
@@ -102,11 +97,31 @@ namespace BugReproduction
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            // Default clearing the screen:
             GraphicsDevice.Clear(Color.Black);
+
+            // Drawing my background by using my shader (which should change all texture color to white):
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, BUGGED_OUT ? WhiteScreenShader : null);
+            {
+                // THIS LINE IS THE PROBLEM!!!!!!!!!!!
+                // ----------------------------------------------------------------------------------------------------
+                spriteBatch.Draw(CoolPixle2016,
+                    new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight),
+                    Color.Teal);
+                // ----------------------------------------------------------------------------------------------------
+            }
+            spriteBatch.End(); // End the drawing call (+ should end my shader call)
+
+            // Beginn a new call, to draw my airplane without the WhiteScreen shader:
             spriteBatch.Begin();
-            spriteBatch.Draw(SomeKindOfWaleAirplane,
-                new Rectangle(50, 50, SomeKindOfWaleAirplane.Width, SomeKindOfWaleAirplane.Height), Color.White);
-            spriteBatch.End();
+            {
+                spriteBatch.Draw(SomeKindOfWaleAirplane,
+                    new Rectangle(50, 50, SomeKindOfWaleAirplane.Width, SomeKindOfWaleAirplane.Height), Color.Blue);
+                    // It's set to blue, so it'll be easier to see, when it works
+            }
+            spriteBatch.End(); // End it here
+
+            // Question: Why doesn't my airplane show up?
 
             base.Draw(gameTime);
         }

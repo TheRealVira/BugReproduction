@@ -25,18 +25,6 @@
 /processorParam:TextureFormat=Color
 /build:Texture/Airplane.png
 
-#begin Shader\P0.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Shader\P0.fx
-
-#begin Shader\P1.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Shader\P1.fx
-
 #begin Shader\P2.fx
 /importer:EffectImporter
 /processor:EffectProcessor
