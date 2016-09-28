@@ -1,34 +1,54 @@
 ﻿#if OPENGL
-#define SV_POSITION POSITION
-#define VS_SHADERMODEL vs_3_0
-#define PS_SHADERMODEL ps_3_0
+	#define SV_POSITION POSITION
+	#define VS_SHADERMODEL vs_3_0
+	#define PS_SHADERMODEL ps_3_0
 #else
-#define VS_SHADERMODEL vs_4_0_level_9_1
-#define PS_SHADERMODEL ps_4_0_level_9_1
+	#define VS_SHADERMODEL vs_4_0_level_9_1
+	#define PS_SHADERMODEL ps_4_0_level_9_1
 #endif
 
-sampler TextureSampler : register(s0);
+Texture2D SpriteTexture;
 
-float2 RumbleVectorR;
-float2 RumbleVectorG;
-float2 RumbleVectorB;
-struct VertexShaderOutput
+sampler2D mySampler : register(s0)
 {
-	float4 Position : TEXCOORD0;
+	Texture = (SpriteTexture);
+};
+
+struct VertexShaderInput
+{
+	float4 Position : SV_POSITION;
+	float2 TexCoord : TEXCOORD0;
 	float4 Color : COLOR0;
 };
 
-float4 RumblePS(VertexShaderOutput input) : COLOR
+struct VertexShaderOutput
 {
-	return float4(1,1,1,1); // This should just return white pixel
-//float value = (0.5 + (frac(sin(dot(input.Position.xy ,float2(12.9898,78.233))) * 43758.5453))*0.5);
-//return float4(0, 1, 0, 1);
+	float4 Position : SV_POSITION;
+	float2 TexCoord : TEXCOORD0;
+	float4 Color : COLOR0;
 };
 
-technique RetroDrawing
+VertexShaderOutput MainVS(in VertexShaderInput input)
+{
+	VertexShaderOutput output = (VertexShaderOutput)0;
+
+	output.Position = input.Position;
+	output.Color = input.Color;
+	output.TexCoord  = input.TexCoord;
+	
+	return output;
+}
+
+float4 MainPS(VertexShaderOutput input) : COLOR
+{
+	return float4(1,1,1,1);
+}
+
+technique BasicColorDrawing
 {
 	pass P0
 	{
-		PixelShader = compile PS_SHADERMODEL RumblePS();
+		VertexShader = compile VS_SHADERMODEL MainVS();
+		PixelShader = compile PS_SHADERMODEL MainPS();
 	}
 };

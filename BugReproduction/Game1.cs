@@ -26,7 +26,7 @@ namespace BugReproduction
     public class Game1 : Game
     {
         // Set this variable to true, to get the "not drawnig" airplane (which is unintended)
-        private const bool BUGGED_OUT = false;
+        private const bool BUGGED_OUT = true;
         private static Texture2D SomeKindOfWaleAirplane;
         public static Texture2D CoolPixle2016;
         private static Effect WhiteScreenShader;
@@ -101,7 +101,7 @@ namespace BugReproduction
             GraphicsDevice.Clear(Color.Black);
 
             // Drawing my background by using my shader (which should change all texture color to white):
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, BUGGED_OUT ? WhiteScreenShader : null);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, BUGGED_OUT ? WhiteScreenShader : null);
             {
                 // THIS LINE IS THE PROBLEM!!!!!!!!!!!
                 // ----------------------------------------------------------------------------------------------------
@@ -113,11 +113,11 @@ namespace BugReproduction
             spriteBatch.End(); // End the drawing call (+ should end my shader call)
 
             // Beginn a new call, to draw my airplane without the WhiteScreen shader:
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Immediate, null, null,null,null,null,null);
             {
                 spriteBatch.Draw(SomeKindOfWaleAirplane,
                     new Rectangle(50, 50, SomeKindOfWaleAirplane.Width, SomeKindOfWaleAirplane.Height), Color.Blue);
-                    // It's set to blue, so it'll be easier to see, when it works
+                // It's set to blue, so it'll be easier to see, when it works
             }
             spriteBatch.End(); // End it here
 
